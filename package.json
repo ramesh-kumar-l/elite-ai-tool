@@ -1,0 +1,23 @@
+{
+  "name": "elite-ai-mastery-system",
+  "version": "1.0.0",
+  "description": "Production-grade AI era personal mastery & opportunity intelligence platform",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "echo 'Frontend builds in client/ directory'",
+    "db:init": "node scripts/initDb.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "sqlite3": "^6.0.1",
+    "uuid": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

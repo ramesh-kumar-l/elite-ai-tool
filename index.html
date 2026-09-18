@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ELITE.AI — Personal Mastery System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+    :root {
+      --bg-primary: #0a0e27;
+      --bg-secondary: #1a1f3a;
+      --bg-tertiary: #252d4a;
+      --border-color: #3a4560;
+      --accent-cyan: #00d9ff;
+      --accent-purple: #a855f7;
+      --accent-electric: #00ff88;
+      --text-primary: #e8eef9;
+      --text-secondary: #a8b5cc;
+      --success: #00ff88;
+      --danger: #ff006b;
+      --warning: #ffa500;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow: hidden;
+    }
+
+    #root {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-cyan);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-purple);
+    }
+
+    /* Global transitions */
+    button, input, select, textarea {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Backdrop blur for modals */
+    .modal-backdrop {
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* Glass morphism effect */
+    .glass {
+      background: rgba(10, 14, 39, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 217, 255, 0.1);
+    }
+
+    /* Neon glow effect */
+    .neon-glow {
+      text-shadow: 0 0 10px var(--accent-cyan), 0 0 20px var(--accent-cyan);
+    }
+
+    /* Loading animation */
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .pulse {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    /* Grid pattern background */
+    @keyframes grid-move {
+      0% { background-position: 0 0; }
+      100% { background-position: 40px 40px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React and dependencies from CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel for JSX transformation in browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Main React App -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // ==================== MAIN APP COMPONENT ====================
+    function EliteAIApp() {
+      const [user, setUser] = useState(null);
+      const [opportunities, setOpportunities] = useState([]);
+      const [decisions, setDecisions] = useState([]);
+      const [learning, setLearning] = useState([]);
+      const [activeTab, setActiveTab] = useState('dashboard');
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        loadUserData();
+        loadOpportunities();
+        loadDecisions();
+        loadLearning();
+      }, []);
+
+      const loadUserData = async () => {
+        try {
+          const res = await fetch('http://localhost:3001/api/user-profile');
+          const data = await res.json();
+          setUser(data);
+        } catch (err) {
+          console.error('Error loading user data:', err);
+        }
+      };
+
+      const loadOpportunities = async () => {
+        try {
+          const res = await fetch('http://localhost:3001/api/opportunities');
+          const data = await res.json();
+          setOpportunities(data);
+        } catch (err) {
+          console.error('Error loading opportunities:', err);
+        }
+      };
+
+      const loadDecisions = async () => {
+        try {
+          const res = await fetch('http://localhost:3001/api/decisions');
+          const data = await res.json();
+          setDecisions(data);
+        } catch (err) {
+          console.error('Error loading decisions:', err);
+        }
+      };
+
+      const loadLearning = async () => {
+        try {
+          const res = await fetch('http://localhost:3001/api/learning');
+          const data = await res.json();
+          setLearning(data);
+          setLoading(false);
+        } catch (err) {
+          console.error('Error loading learning data:', err);
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-primary)' }}>
+          {/* Sidebar Navigation */}
+          <nav style={{
+            width: '280px',
+            background: 'var(--bg-secondary)',
+            borderRight: '1px solid var(--border-color)',
+            padding: '32px 24px',
+            overflow: 'auto'
+          }}>
+            <h1 style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              marginBottom: '32px',
+              color: 'var(--accent-cyan)',
+              textShadow: '0 0 10px var(--accent-cyan)',
+              letterSpacing: '2px'
+            }}>
+              ◆ ELITE.AI
+            </h1>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {[
+                { id: 'dashboard', label: '📊 Dashboard', icon: '█' },
+                { id: 'opportunities', label: '🎯 Opportunities', icon: '◆' },
+                { id: 'decisions', label: '⚡ Decisions', icon: '▲' },
+                { id: 'learning', label: '📈 Learning', icon: '◇' },
+                { id: 'analysis', label: '🧠 Analysis', icon: '▸' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    padding: '12px 16px',
+                    background: activeTab === tab.id ? 'rgba(0, 217, 255, 0.1)' : 'transparent',
+                    border: activeTab === tab.id ? '1px solid var(--accent-cyan)' : '1px solid var(--border-color)',
+                    color: activeTab === tab.id ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontFamily: 'JetBrains Mono',
+                    fontWeight: activeTab === tab.id ? '600' : '400',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeTab !== tab.id) {
+                      e.target.style.borderColor = 'var(--accent-cyan)';
+                      e.target.style.color = 'var(--accent-cyan)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== tab.id) {
+                      e.target.style.borderColor = 'var(--border-color)';
+                      e.target.style.color = 'var(--text-secondary)';
+                    }
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '24px 0' }} />
+
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              <p style={{ marginBottom: '12px' }}>
+                <strong>Phase:</strong><br />
+                {user?.currentPhase || 'foundation'}
+              </p>
+              <p>
+                <strong>Vision:</strong><br />
+                {user?.vision || 'Not set'}
+              </p>
+            </div>
+          </nav>
+
+          {/* Main Content */}
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            {/* Header */}
+            <header style={{
+              padding: '24px 32px',
+              borderBottom: '1px solid var(--border-color)',
+              background: 'rgba(10, 14, 39, 0.5)',
+              backdropFilter: 'blur(10px)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 style={{
+                  fontSize: '24px',
+                  fontWeight: 'bold',
+                  color: 'var(--text-primary)',
+                  letterSpacing: '1px'
+                }}>
+                  {activeTab.toUpperCase()}
+                </h2>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  {new Date().toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })}
+                </div>
+              </div>
+            </header>
+
+            {/* Content Area */}
+            <div style={{ flex: 1, overflow: 'auto', padding: '32px' }}>
+              {loading ? (
+                <LoadingScreen />
+              ) : activeTab === 'dashboard' ? (
+                <Dashboard user={user} opportunities={opportunities} decisions={decisions} learning={learning} />
+              ) : activeTab === 'opportunities' ? (
+                <OpportunitiesView opportunities={opportunities} onRefresh={loadOpportunities} />
+              ) : activeTab === 'decisions' ? (
+                <DecisionsView decisions={decisions} onRefresh={loadDecisions} />
+              ) : activeTab === 'learning' ? (
+                <LearningView learning={learning} onRefresh={loadLearning} />
+              ) : activeTab === 'analysis' ? (
+                <AnalysisView user={user} />
+              ) : null}
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // ==================== DASHBOARD COMPONENT ====================
+    function Dashboard({ user, opportunities, decisions, learning }) {
+      const totalConfidence = opportunities.reduce((acc, o) => acc + o.confidence, 0) / Math.max(opportunities.length, 1);
+      const avgVelocity = learning.reduce((acc, l) => acc + parseFloat(l.velocityScore), 0) / Math.max(learning.length, 1);
+      
+      return (
+        <div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '24px',
+            marginBottom: '32px'
+          }}>
+            <MetricCard label="Active Opportunities" value={opportunities.length} accent="cyan" />
+            <MetricCard label="Decisions Logged" value={decisions.length} accent="purple" />
+            <MetricCard label="Skills in Progress" value={learning.length} accent="electric" />
+            <MetricCard label="Avg. Opportunity Confidence" value={(totalConfidence * 100).toFixed(0) + '%'} accent="cyan" />
+            <MetricCard label="Learning Velocity" value={avgVelocity.toFixed(1)} accent="purple" />
+            <MetricCard label="Next Milestone" value={user?.currentPhase || 'foundation'} accent="electric" />
+          </div>
+
+          {/* Opportunity Matrix */}
+          <div style={{
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            padding: '24px',
+            marginBottom: '24px'
+          }}>
+            <h3 style={{ marginBottom: '16px', color: 'var(--accent-cyan)', fontSize: '16px' }}>
+              ◆ Opportunity Matrix (Top 5)
+            </h3>
+            {opportunities.slice(0, 5).length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {opportunities.slice(0, 5).map(opp => (
+                  <div key={opp.id} style={{
+                    padding: '12px',
+                    background: 'rgba(0, 217, 255, 0.05)',
+                    border: '1px solid rgba(0, 217, 255, 0.2)',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <div>
+                      <div style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>{opp.title}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{opp.sector}</div>
+                    </div>
+                    <div style={{
+                      background: `rgba(0, 217, 255, ${opp.confidence / 100})`,
+                      padding: '6px 12px',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      color: 'var(--accent-cyan)',
+                      fontWeight: 'bold'
+                    }}>
+                      {(opp.confidence * 100).toFixed(0)}%
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
+                No opportunities tracked yet. Go to Opportunities tab to add one.
+              </div>
+            )}
+          </div>
+
+          {/* Recent Decisions */}
+          <div style={{
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            padding: '24px'
+          }}>
+            <h3 style={{ marginBottom: '16px', color: 'var(--accent-purple)', fontSize: '16px' }}>
+              ⚡ Recent Decisions
+            </h3>
+            {decisions.slice(0, 3).length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {decisions.slice(0, 3).map(dec => (
+                  <div key={dec.id} style={{
+                    padding: '12px',
+                    background: 'rgba(168, 85, 247, 0.05)',
+                    border: '1px solid rgba(168, 85, 247, 0.2)',
+                    borderRadius: '4px'
+                  }}>
+                    <div style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>{dec.title}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                      Chosen: {dec.chosen}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
+                No decisions logged yet. Go to Decisions tab to document your decisions.
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== METRIC CARD COMPONENT ====================
+    function MetricCard({ label, value, accent }) {
+      const accentVar = accent === 'cyan' ? 'var(--accent-cyan)' 
+                      : accent === 'purple' ? 'var(--accent-purple)'
+                      : 'var(--accent-electric)';
+
+      return (
+        <div style={{
+          background: 'var(--bg-secondary)',
+          border: `1px solid ${accentVar}33`,
+          borderRadius: '8px',
+          padding: '20px',
+          transition: 'all 0.3s ease',
+          cursor: 'pointer'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = accentVar;
+          e.currentTarget.style.boxShadow = `0 0 20px ${accentVar}44`;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = `${accentVar}33`;
+          e.currentTarget.style.boxShadow = 'none';
+        }}
+        >
+          <div style={{
+            fontSize: '12px',
+            color: 'var(--text-secondary)',
+            marginBottom: '12px',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+          }}>
+            {label}
+          </div>
+          <div style={{
+            fontSize: '32px',
+            fontWeight: 'bold',
+            color: accentVar,
+            textShadow: `0 0 10px ${accentVar}66`
+          }}>
+            {value}
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== OPPORTUNITIES VIEW ====================
+    function OpportunitiesView({ opportunities, onRefresh }) {
+      const [showForm, setShowForm] = useState(false);
+
+      return (
+        <div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            style={{
+              padding: '12px 24px',
+              background: 'var(--accent-cyan)',
+              color: 'var(--bg-primary)',
+              border: 'none',
+              borderRadius: '4px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              marginBottom: '24px',
+              fontSize: '13px',
+              fontFamily: 'JetBrains Mono'
+            }}
+          >
+            + New Opportunity
+          </button>
+
+          {showForm && <OpportunityForm onSubmit={() => { setShowForm(false); onRefresh(); }} />}
+
+          <div style={{ display: 'grid', gap: '16px' }}>
+            {opportunities.map(opp => (
+              <OpportunityCard key={opp.id} opportunity={opp} />
+            ))}
+            {opportunities.length === 0 && (
+              <div style={{ color: 'var(--text-secondary)', padding: '32px', textAlign: 'center' }}>
+                No opportunities tracked yet. Add one to start building your opportunity intelligence.
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    function OpportunityCard({ opportunity }) {
+      return (
+        <div style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-color)',
+          borderRadius: '8px',
+          padding: '20px',
+          transition: 'all 0.3s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+          e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 217, 255, 0.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = 'var(--border-color)';
+          e.currentTarget.style.boxShadow = 'none';
+        }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
+            <div>
+              <h4 style={{ color: 'var(--accent-cyan)', marginBottom: '4px' }}>{opportunity.title}</h4>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{opportunity.sector}</div>
+            </div>
+            <div style={{
+              background: `rgba(0, 217, 255, ${opportunity.confidence / 100})`,
+              padding: '6px 12px',
+              borderRadius: '4px',
+              fontSize: '11px',
+              color: 'var(--accent-cyan)',
+              fontWeight: 'bold'
+            }}>
+              {(opportunity.confidence * 100).toFixed(0)}%
+            </div>
+          </div>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: '1.5' }}>
+            {opportunity.description}
+          </p>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '12px',
+            fontSize: '11px'
+          }}>
+            <div>
+              <span style={{ color: 'var(--text-secondary)' }}>Stage:</span>
+              <div style={{ color: 'var(--accent-cyan)', fontWeight: 'bold' }}>{opportunity.stage}</div>
+            </div>
+            <div>
+              <span style={{ color: 'var(--text-secondary)' }}>Timing:</span>
+              <div style={{ color: 'var(--accent-purple)', fontWeight: 'bold' }}>{opportunity.marketTiming || 'TBD'}</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function OpportunityForm({ onSubmit }) {
+      const [formData, setFormData] = useState({
+        title: '',
+        sector: '',
+        description: '',
+        confidence: 0.5,
+        stage: 'identified',
+        marketTiming: ''
+      });
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          await fetch('http://localhost:3001/api/opportunities', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          });
+          onSubmit();
+        } catch (err) {
+          console.error('Error submitting opportunity:', err);
+        }
+      };
+
+      return (
+        <form onSubmit={handleSubmit} style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--accent-cyan)',
+          borderRadius: '8px',
+          padding: '24px',
+          marginBottom: '24px'
+        }}>
+          <div style={{ display: 'grid', gap: '16px' }}>
+            <input
+              type="text"
+              placeholder="Opportunity Title"
+              value={formData.title}
+              onChange={(e) => setFormData({...formData, title: e.target.value})}
+              style={{
+                padding: '12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px'
+              }}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Sector"
+              value={formData.sector}
+              onChange={(e) => setFormData({...formData, sector: e.target.value})}
+              style={{
+                padding: '12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px'
+              }}
+            />
+            <textarea
+              placeholder="Description"
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              style={{
+                padding: '12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px',
+                minHeight: '100px',
+                fontStyle: 'normal'
+              }}
+            />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={formData.confidence}
+                onChange={(e) => setFormData({...formData, confidence: parseFloat(e.target.value)})}
+                style={{ cursor: 'pointer' }}
+                title="Confidence (0-1)"
+              />
+              <input
+                type="text"
+                placeholder="Market Timing"
+                value={formData.marketTiming}
+                onChange={(e) => setFormData({...formData, marketTiming: e.target.value})}
+                style={{
+                  padding: '12px',
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '4px',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'JetBrains Mono',
+                  fontSize: '13px'
+                }}
+              />
+            </div>
+            <button
+              type="submit"
+              style={{
+                padding: '12px',
+                background: 'var(--accent-cyan)',
+                color: 'var(--bg-primary)',
+                border: 'none',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontFamily: 'JetBrains Mono'
+              }}
+            >
+              Create Opportunity
+            </button>
+          </div>
+        </form>
+      );
+    }
+
+    // ==================== DECISIONS VIEW ====================
+    function DecisionsView({ decisions, onRefresh }) {
+      const [showForm, setShowForm] = useState(false);
+
+      return (
+        <div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            style={{
+              padding: '12px 24px',
+              background: 'var(--accent-purple)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              marginBottom: '24px',
+              fontSize: '13px',
+              fontFamily: 'JetBrains Mono'
+            }}
+          >
+            + New Decision
+          </button>
+
+          {showForm && <DecisionForm onSubmit={() => { setShowForm(false); onRefresh(); }} />}
+
+          <div style={{ display: 'grid', gap: '16px' }}>
+            {decisions.map(dec => (
+              <DecisionCard key={dec.id} decision={dec} />
+            ))}
+            {decisions.length === 0 && (
+              <div style={{ color: 'var(--text-secondary)', padding: '32px', textAlign: 'center' }}>
+                No decisions logged yet. Start documenting your major decisions.
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    function DecisionCard({ decision }) {
+      return (
+        <div style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-color)',
+          borderRadius: '8px',
+          padding: '20px'
+        }}>
+          <h4 style={{ color: 'var(--accent-purple)', marginBottom: '8px' }}>{decision.title}</h4>
+          <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+            <p><strong>Context:</strong> {decision.context}</p>
+          </div>
+          <div style={{
+            background: 'rgba(168, 85, 247, 0.05)',
+            padding: '12px',
+            borderRadius: '4px',
+            marginBottom: '12px'
+          }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>CHOSEN OPTION</div>
+            <div style={{ fontSize: '13px', color: 'var(--accent-purple)', fontWeight: 'bold' }}>{decision.chosen}</div>
+          </div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+            <p><strong>Rationale:</strong> {decision.rationale}</p>
+          </div>
+        </div>
+      );
+    }
+
+    function DecisionForm({ onSubmit }) {
+      const [formData, setFormData] = useState({
+        title: '',
+        context: '',
+        options: ['Option 1', 'Option 2'],
+        chosen: 'Option 1',
+        rationale: ''
+      });
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          await fetch('http://localhost:3001/api/decisions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          });
+          onSubmit();
+        } catch (err) {
+          console.error('Error submitting decision:', err);
+        }
+      };
+
+      return (
+        <form onSubmit={handleSubmit} style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--accent-purple)',
+          borderRadius: '8px',
+          padding: '24px',
+          marginBottom: '24px'
+        }}>
+          <div style={{ display: 'grid', gap: '16px' }}>
+            <input
+              type="text"
+              placeholder="Decision Title"
+              value={formData.title}
+              onChange={(e) => setFormData({...formData, title: e.target.value})}
+              style={{
+                padding: '12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px'
+              }}
+              required
+            />
+            <textarea
+              placeholder="Context & Situation"
+              value={formData.context}
+              onChange={(e) => setFormData({...formData, context: e.target.value})}
+              style={{
+                padding: '12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px',
+                minHeight: '80px'
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Chosen Option"
+              value={formData.chosen}
+              onChange={(e) => setFormData({...formData, chosen: e.target.value})}
+              style={{
+                padding: '12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px'
+              }}
+              required
+            />
+            <textarea
+              placeholder="Rationale & Thinking"
+              value={formData.rationale}
+              onChange={(e) => setFormData({...formData, rationale: e.target.value})}
+              style={{
+                padding: '12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px',
+                minHeight: '80px'
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                padding: '12px',
+                background: 'var(--accent-purple)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontFamily: 'JetBrains Mono'
+              }}
+            >
+              Log Decision
+            </button>
+          </div>
+        </form>
+      );
+    }
+
+    // ==================== LEARNING VIEW ====================
+    function LearningView({ learning, onRefresh }) {
+      const [showForm, setShowForm] = useState(false);
+
+      return (
+        <div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            style={{
+              padding: '12px 24px',
+              background: 'var(--accent-electric)',
+              color: 'var(--bg-primary)',
+              border: 'none',
+              borderRadius: '4px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              marginBottom: '24px',
+              fontSize: '13px',
+              fontFamily: 'JetBrains Mono'
+            }}
+          >
+            + Log Learning
+          </button>
+
+          {showForm && <LearningForm onSubmit={() => { setShowForm(false); onRefresh(); }} />}
+
+          <div style={{ display: 'grid', gap: '16px' }}>
+            {learning.map(log => (
+              <LearningCard key={log.id} log={log} />
+            ))}
+            {learning.length === 0 && (
+              <div style={{ color: 'var(--text-secondary)', padding: '32px', textAlign: 'center' }}>
+                No learning logged yet. Track your skill acquisition and learning velocity.
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    function LearningCard({ log }) {
+      return (
+        <div style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-color)',
+          borderRadius: '8px',
+          padding: '20px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
+            <div>
+              <h4 style={{ color: 'var(--accent-electric)', marginBottom: '4px' }}>{log.skill}</h4>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Domain: {log.domain}</div>
+            </div>
+            <div style={{
+              background: 'rgba(0, 255, 136, 0.1)',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              fontSize: '11px',
+              color: 'var(--accent-electric)',
+              fontWeight: 'bold'
+            }}>
+              {log.velocityScore} pts
+            </div>
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '12px',
+            fontSize: '11px'
+          }}>
+            <div>
+              <span style={{ color: 'var(--text-secondary)' }}>Hours:</span>
+              <div style={{ color: 'var(--accent-electric)', fontWeight: 'bold' }}>{log.hoursInvested}h</div>
+            </div>
+            <div>
+              <span style={{ color: 'var(--text-secondary)' }}>Competence:</span>
+              <div style={{ color: 'var(--accent-electric)', fontWeight: 'bold' }}>{(log.competenceLevel * 100).toFixed(0)}%</div>
+            </div>
+            <div>
+              <span style={{ color: 'var(--text-secondary)' }}>Application:</span>
+              <div style={{ color: 'var(--accent-electric)', fontWeight: 'bold' }}>{log.practicalApplication || 'TBD'}</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function LearningForm({ onSubmit }) {
+      const [formData, setFormData] = useState({
+        skill: '',
+        domain: '',
+        hoursInvested: 0,
+        competenceLevel: 0,
+        practicalApplication: ''
+      });
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          await fetch('http://localhost:3001/api/learning', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          });
+          onSubmit();
+        } catch (err) {
+          console.error('Error submitting learning:', err);
+        }
+      };
+
+      return (
+        <form onSubmit={handleSubmit} style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--accent-electric)',
+          borderRadius: '8px',
+          padding: '24px',
+          marginBottom: '24px'
+        }}>
+          <div style={{ display: 'grid', gap: '16px' }}>
+            <input
+              type="text"
+              placeholder="Skill Name"
+              value={formData.skill}
+              onChange={(e) => setFormData({...formData, skill: e.target.value})}
+              style={{
+                padding: '12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px'
+              }}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Domain (e.g., AI, Business, Personal)"
+              value={formData.domain}
+              onChange={(e) => setFormData({...formData, domain: e.target.value})}
+              style={{
+                padding: '12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px'
+              }}
+            />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--text-secondary)' }}>Hours Invested</label>
+                <input
+                  type="number"
+                  value={formData.hoursInvested}
+                  onChange={(e) => setFormData({...formData, hoursInvested: parseFloat(e.target.value)})}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '4px',
+                    color: 'var(--text-primary)',
+                    fontFamily: 'JetBrains Mono',
+                    fontSize: '13px'
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '4px', fontSize: '11px', color: 'var(--text-secondary)' }}>Competence (0-1)</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={formData.competenceLevel}
+                  onChange={(e) => setFormData({...formData, competenceLevel: parseFloat(e.target.value)})}
+                  style={{ width: '100%', cursor: 'pointer' }}
+                />
+              </div>
+            </div>
+            <input
+              type="text"
+              placeholder="Practical Application (how you used it)"
+              value={formData.practicalApplication}
+              onChange={(e) => setFormData({...formData, practicalApplication: e.target.value})}
+              style={{
+                padding: '12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px'
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                padding: '12px',
+                background: 'var(--accent-electric)',
+                color: 'var(--bg-primary)',
+                border: 'none',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontFamily: 'JetBrains Mono'
+              }}
+            >
+              Log Learning
+            </button>
+          </div>
+        </form>
+      );
+    }
+
+    // ==================== ANALYSIS VIEW ====================
+    function AnalysisView({ user }) {
+      const [mode, setMode] = useState('WHAT');
+      const [question, setQuestion] = useState('');
+      const [analysis, setAnalysis] = useState(null);
+
+      const handleAnalysis = async () => {
+        try {
+          const res = await fetch('http://localhost:3001/api/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question, mode })
+          });
+          const data = await res.json();
+          setAnalysis(data);
+        } catch (err) {
+          console.error('Error running analysis:', err);
+        }
+      };
+
+      return (
+        <div>
+          <div style={{
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--accent-cyan)',
+            borderRadius: '8px',
+            padding: '24px',
+            marginBottom: '24px'
+          }}>
+            <h3 style={{ marginBottom: '16px', color: 'var(--accent-cyan)' }}>Three-Dimensional Analysis Framework</h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px', marginBottom: '16px' }}>
+              {['WHAT', 'HOW', 'WHERE', 'SYNTHESIS'].map(m => (
+                <button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  style={{
+                    padding: '12px',
+                    background: mode === m ? 'var(--accent-cyan)' : 'var(--bg-tertiary)',
+                    color: mode === m ? 'var(--bg-primary)' : 'var(--accent-cyan)',
+                    border: `1px solid var(--accent-cyan)`,
+                    borderRadius: '4px',
+                    fontFamily: 'JetBrains Mono',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+
+            <textarea
+              placeholder="What's your challenge, opportunity, or question?"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                color: 'var(--text-primary)',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px',
+                minHeight: '100px',
+                marginBottom: '16px',
+                fontStyle: 'normal'
+              }}
+            />
+
+            <button
+              onClick={handleAnalysis}
+              style={{
+                padding: '12px 24px',
+                background: 'var(--accent-cyan)',
+                color: 'var(--bg-primary)',
+                border: 'none',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontFamily: 'JetBrains Mono'
+              }}
+            >
+              Run {mode} Analysis
+            </button>
+          </div>
+
+          {analysis && (
+            <div style={{
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '8px',
+              padding: '24px'
+            }}>
+              <h3 style={{ color: 'var(--accent-cyan)', marginBottom: '16px' }}>Analysis Result</h3>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.8' }}>
+                <div style={{ marginBottom: '16px' }}>
+                  <strong style={{ color: 'var(--text-primary)' }}>Mode:</strong> {analysis.mode}
+                </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <strong style={{ color: 'var(--text-primary)' }}>Question:</strong> {analysis.question}
+                </div>
+                <div style={{
+                  background: 'rgba(0, 217, 255, 0.05)',
+                  padding: '12px',
+                  borderRadius: '4px',
+                  marginBottom: '16px'
+                }}>
+                  <strong style={{ color: 'var(--accent-cyan)' }}>Framework:</strong>
+                  <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                    {Object.entries(analysis.framework).map(([key, value]) => (
+                      <li key={key} style={{ marginBottom: '8px' }}>
+                        <span style={{ color: 'var(--text-secondary)' }}>{key}:</span> {value}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ==================== LOADING SCREEN ====================
+    function LoadingScreen() {
+      return (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          flexDirection: 'column',
+          gap: '24px'
+        }}>
+          <div style={{
+            fontSize: '48px',
+            color: 'var(--accent-cyan)',
+            textShadow: '0 0 20px var(--accent-cyan)',
+            animation: 'pulse-glow 2s ease-in-out infinite'
+          }}>
+            ◆
+          </div>
+          <div style={{
+            fontSize: '16px',
+            color: 'var(--text-secondary)',
+            letterSpacing: '2px'
+          }}>
+            Initializing ELITE.AI...
+          </div>
+        </div>
+      );
+    }
+
+    // Render the app
+    ReactDOM.createRoot(document.getElementById('root')).render(<EliteAIApp />);
+  </script>
+</body>
+</html>
